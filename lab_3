@@ -1,0 +1,285 @@
+For mongosh info see: https://www.mongodb.com/docs/mongodb-shell/
+
+Atlas atlas-vptofm-shard-0 [primary] test> use student_db;
+switched to db student_db
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.insertMany([
+...   { rollNo: 101, name: "Arjun", dept: "CSE", marks: 85, city: "Bangalore" },
+...   { rollNo: 102, name: "Meera", dept: "ECE", marks: 78, city: "Mysore" },
+...   { rollNo: 103, name: "Ravi", dept: "ISE", marks: 92, city: "Delhi" },
+...   { rollNo: 104, name: "Sneha", dept: "CSE", marks: 36, city: "Chennai" },
+...   { rollNo: 105, name: "Kiran", dept: "ME", marks: 67, city: "Mumbai" }
+... ]
+... )
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('69929290cb7be5e31b628ca0'),
+    '1': ObjectId('69929290cb7be5e31b628ca1'),
+    '2': ObjectId('69929290cb7be5e31b628ca2'),
+    '3': ObjectId('69929290cb7be5e31b628ca3'),
+    '4': ObjectId('69929290cb7be5e31b628ca4')
+  }
+}
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.updateOne({ rollNo: 101 }, { $set: { marks: 95 } })
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.find()
+[
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca0'),
+    rollNo: 101,
+    name: 'Arjun',
+    dept: 'CSE',
+    marks: 95,
+    city: 'Bangalore'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca1'),
+    rollNo: 102,
+    name: 'Meera',
+    dept: 'ECE',
+    marks: 78,
+    city: 'Mysore'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca2'),
+    rollNo: 103,
+    name: 'Ravi',
+    dept: 'ISE',
+    marks: 92,
+    city: 'Delhi'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca3'),
+    rollNo: 104,
+    name: 'Sneha',
+    dept: 'CSE',
+    marks: 36,
+    city: 'Chennai'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca4'),
+    rollNo: 105,
+    name: 'Kiran',
+    dept: 'ME',
+    marks: 67,
+    city: 'Mumbai'
+  }
+]
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.find({ dept: "CSE", marks: { $gt: 80 } })
+[
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca0'),
+    rollNo: 101,
+    name: 'Arjun',
+    dept: 'CSE',
+    marks: 95,
+    city: 'Bangalore'
+  }
+]
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.find({ dept: { $in: ["CSE", "ECE"] } })
+[
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca0'),
+    rollNo: 101,
+    name: 'Arjun',
+    dept: 'CSE',
+    marks: 95,
+    city: 'Bangalore'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca1'),
+    rollNo: 102,
+    name: 'Meera',
+    dept: 'ECE',
+    marks: 78,
+    city: 'Mysore'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca3'),
+    rollNo: 104,
+    name: 'Sneha',
+    dept: 'CSE',
+    marks: 36,
+    city: 'Chennai'
+  }
+]
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.find(
+...   { marks: { $gte: 60, $lte: 90 } },
+...   { _id: 0, name: 1, marks: 1 }
+... )
+[ { name: 'Meera', marks: 78 }, { name: 'Kiran', marks: 67 } ]
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.insertOne({
+...   rollNo: 106,
+...   name: "Nisha",
+...   dept: "CSE",
+...   marks: 70,
+...   city: null
+... })
+{
+  acknowledged: true,
+  insertedId: ObjectId('699292f3cb7be5e31b628ca5')
+}
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.find({ city: null })
+[
+  {
+    _id: ObjectId('699292f3cb7be5e31b628ca5'),
+    rollNo: 106,
+    name: 'Nisha',
+    dept: 'CSE',
+    marks: 70,
+    city: null
+  }
+]
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.find({ city: { $exists: false } })
+
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.updateMany(
+...   { city: null },
+...   { $set: { city: "Unknown" } }
+... )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.countDocuments()
+6
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.countDocuments({ dept: "ISE" })
+1
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.countDocuments({ marks: { $gt: 75 } })
+3
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.find().sort({ marks: -1 })
+[
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca0'),
+    rollNo: 101,
+    name: 'Arjun',
+    dept: 'CSE',
+    marks: 95,
+    city: 'Bangalore'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca2'),
+    rollNo: 103,
+    name: 'Ravi',
+    dept: 'ISE',
+    marks: 92,
+    city: 'Delhi'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca1'),
+    rollNo: 102,
+    name: 'Meera',
+    dept: 'ECE',
+    marks: 78,
+    city: 'Mysore'
+  },
+  {
+    _id: ObjectId('699292f3cb7be5e31b628ca5'),
+    rollNo: 106,
+    name: 'Nisha',
+    dept: 'CSE',
+    marks: 70,
+    city: 'Unknown'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca4'),
+    rollNo: 105,
+    name: 'Kiran',
+    dept: 'ME',
+    marks: 67,
+    city: 'Mumbai'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca3'),
+    rollNo: 104,
+    name: 'Sneha',
+    dept: 'CSE',
+    marks: 36,
+    city: 'Chennai'
+  }
+]
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.find().sort({ marks: -1 }).limit(3)
+[
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca0'),
+    rollNo: 101,
+    name: 'Arjun',
+    dept: 'CSE',
+    marks: 95,
+    city: 'Bangalore'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca2'),
+    rollNo: 103,
+    name: 'Ravi',
+    dept: 'ISE',
+    marks: 92,
+    city: 'Delhi'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca1'),
+    rollNo: 102,
+    name: 'Meera',
+    dept: 'ECE',
+    marks: 78,
+    city: 'Mysore'
+  }
+]
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.find().skip(2).limit(3)
+[
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca2'),
+    rollNo: 103,
+    name: 'Ravi',
+    dept: 'ISE',
+    marks: 92,
+    city: 'Delhi'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca3'),
+    rollNo: 104,
+    name: 'Sneha',
+    dept: 'CSE',
+    marks: 36,
+    city: 'Chennai'
+  },
+  {
+    _id: ObjectId('69929290cb7be5e31b628ca4'),
+    rollNo: 105,
+    name: 'Kiran',
+    dept: 'ME',
+    marks: 67,
+    city: 'Mumbai'
+  }
+]
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.aggregate([
+...   { $group: { _id: null, avgMarks: { $avg: "$marks" } } }
+... ])
+[ { _id: null, avgMarks: 73 } ]
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.aggregate([
+...   { $group: { _id: "$dept", totalMarks: { $sum: "$marks" } } }
+... ])
+[
+  { _id: 'CSE', totalMarks: 201 },
+  { _id: 'ECE', totalMarks: 78 },
+  { _id: 'ISE', totalMarks: 92 },
+  { _id: 'ME', totalMarks: 67 }
+]
+Atlas atlas-vptofm-shard-0 [primary] student_db> db.students.aggregate([
+...   { $group: { _id: "$dept", maxMarks: { $max: "$marks" } } }
+... ])
+[
+  { _id: 'ISE', maxMarks: 92 },
+  { _id: 'ME', maxMarks: 67 },
+  { _id: 'CSE', maxMarks: 95 },
+  { _id: 'ECE', maxMarks: 78 }
+]
+Atlas atlas-vptofm-shard-0 [primary] student_db>
